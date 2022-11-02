@@ -1,0 +1,57 @@
+function doGet(e){
+  Logger.log("--- doGet ---");
+ 
+ var temperature = "",
+     moisture = "",
+     pressure = "";
+ 
+  try {
+    // this helps during debuggin
+    if (e == null){e={}; e.parameters = {temperature:"test",moisture:"-1",pressure:"-1"};}
+    temperature = e.parameters.temperature;
+    moisture = e.parameters.moisture;
+    pressure = e.parameters.pressure;
+ 
+    // save the data to spreadsheet
+    save_data(temperature, moisture, pressure);
+ 
+ 
+    return ContentService.createTextOutput("Wrote:\n  temperature: " + temperature + "\n  moisture: " + moisture + "\n  pressure: " + pressure);
+ 
+  } catch(error) { 
+    Logger.log(error);    
+    return ContentService.createTextOutput("oops...." + error.message);
+  }  
+}
+//https://script.google.com/macros/s/AKfycbykhRYyuenN6P1WYPeYQ7RqIR2l4j9ubVpODGJgVl2iRMCxsFfCEbxoXxpW7v1X7dqmeg/exec
+// Method to save given data to a sheet
+function save_data(temperature, moisture, pressure){
+  Logger.log("--- save_data ---"); 
+ 
+ 
+  try {
+    var dateTime = new Date();
+ 
+    // Paste the URL of the Google Sheets starting from https thru /edit
+    // For e.g.: https://docs.google.com/..../edit 
+    var ss = SpreadsheetApp.openById("1x_r71iWXzli1G5OCVk94yroruudDVN-yOsKU-SUEu4E");
+    var dataLoggerSheet = ss.getSheetByName("Sheet1");
+ 
+ 
+    // Get last edited row from DataLogger sheet
+    var row = dataLoggerSheet.getLastRow() + 1;
+ 
+ 
+    // Start Populating the data
+    dataLoggerSheet.getRange("A" + row).setValue(dateTime); // dateTime
+    dataLoggerSheet.getRange("B" + row).setValue(temperature); // Temperature
+    dataLoggerSheet.getRange("C" + row).setValue(moisture); // Moisture
+    dataLoggerSheet.getRange("D" + row).setValue(pressure); // Pressure
+  }
+ 
+  catch(error) {
+    Logger.log(JSON.stringify(error));
+  }
+ 
+  Logger.log("--- save_data end---"); 
+}
